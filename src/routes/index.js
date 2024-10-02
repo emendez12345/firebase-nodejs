@@ -13,7 +13,13 @@ admin.initializeApp({
 const db=admin.database();
 
 router.get('/',(req,res)=>{
-    res.render('index');
+    //[1]-consultamos firebase
+    //[2]-En data nos trae la información
+    //[3]-Se la pasamos a index
+        db.ref('contacts').once('value',(snapshot)=>{
+        const data = snapshot.val();
+        res.render('index',{contacts:data});
+    });
 });
 
 router.post('/new-contact',(req,res)=>{
@@ -24,8 +30,13 @@ router.post('/new-contact',(req,res)=>{
         email:req.body.email
     }
     db.ref('contacts').push(newContact);
-    res.send('received');
+    res.redirect('/');
 });
+
+router.get('/delete-contact/:id',(req,res)=>{
+    db.ref('contacts/'+ req.params.id).remove();
+    res.redirect('/');
+})
 
 
 module.exports=router;
